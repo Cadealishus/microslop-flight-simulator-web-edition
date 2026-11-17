@@ -17,27 +17,23 @@
   #loading.done { opacity: 0; pointer-events: none; }
   #title { position: absolute; top: 38%; left: 0; right: 0; text-align: center; color: #fff; font: italic 900 64px/1 "Segoe UI", system-ui, sans-serif; text-shadow: 0 4px 24px #0008; }
   #loading.has-art #title { display: none; }
-  #panel { width: min(560px, calc(100% - 32px)); margin-bottom: 48px; padding: 14px 18px; border-radius: 12px; background: #06101fcc; backdrop-filter: blur(6px); color: #e8f0ff; box-shadow: 0 8px 32px #0006; }
-  #status { font-size: 15px; margin-bottom: 10px; }
-  #bar { height: 6px; border-radius: 3px; background: #ffffff22; overflow: hidden; }
-  #fill { height: 100%; width: 0; background: linear-gradient(90deg, #3aa0ff, #7fd0ff); transition: width .2s; }
-  #hint { margin-top: 10px; font-size: 12px; color: #a9bbd8; }
+  #pct { position: absolute; right: 28px; bottom: 20px; color: #fff; font: italic 800 40px/1 "Segoe UI", system-ui, sans-serif; text-shadow: 0 2px 12px #000a, 0 0 2px #000; font-variant-numeric: tabular-nums; }
+  /* only shown when something went wrong (the game writes its own failures here too) */
+  #status { position: absolute; left: 50%; bottom: 32px; transform: translateX(-50%); max-width: min(560px, calc(100% - 32px)); padding: 12px 16px; border-radius: 10px; background: #06101fdd; color: #e8f0ff; font-size: 15px; }
+  #status:empty { display: none; }
 </style>
 </head>
 <body>
 <canvas id="game" tabindex="0"></canvas>
 <div id="loading">
   <div id="title">Microslop Flight Simulator</div>
-  <div id="panel">
-    <div id="status">Loading…</div>
-    <div id="bar"><div id="fill"></div></div>
-    <div id="hint">Needs a browser with WebGPU: Chrome, Edge, or a recent Safari or Firefox. Click the game once to turn the sound on.</div>
-  </div>
+  <div id="pct">0%</div>
+  <div id="status"></div>
 </div>
 <script type="module">
   import init from "./pkg/fablegame.js";
   const status = document.getElementById("status");
-  const fill = document.getElementById("fill");
+  const pct = document.getElementById("pct");
   // Only cover the page with the artwork once it has loaded (else the gradient and title show).
   const art = new Image();
   art.onload = () => document.getElementById("loading").classList.add("has-art");
@@ -50,7 +46,9 @@
       // The game is one large download (the aircraft are built in): show how far along it is.
       const res = await fetch("pkg/fablegame_bg.wasm");
       if (!res.ok) throw new Error("HTTP " + res.status);
-      const total = +res.headers.get("content-length") || 0;
+      // The real size (the server may send it compressed, so its own length can be smaller).
+      const size = await fetch("pkg/size.txt").then(r => r.ok ? r.text() : "").catch(() => "");
+      const total = +size || (res.headers.get("content-encoding") ? 0 : +res.headers.get("content-length")) || 76000000;
       const reader = res.body.getReader();
       const parts = [];
       let got = 0;
@@ -59,15 +57,12 @@
         if (done) break;
         parts.push(value);
         got += value.length;
-        const mb = (got / 1048576).toFixed(0);
-        status.textContent = total ? `Downloading the game… ${mb} of ${(total / 1048576).toFixed(0)} MB` : `Downloading the game… ${mb} MB`;
-        fill.style.width = total ? (100 * got / total).toFixed(1) + "%" : "50%";
+        pct.textContent = Math.min(99, Math.floor(100 * got / total)) + "%";
       }
       const bytes = new Uint8Array(got);
       let at = 0;
       for (const p of parts) { bytes.set(p, at); at += p.length; }
-      fill.style.width = "100%";
-      status.textContent = "Starting the engines…";
+      pct.textContent = "100%";
       await init({ module_or_path: bytes });
       document.getElementById("game").focus();
     } catch (e) {
