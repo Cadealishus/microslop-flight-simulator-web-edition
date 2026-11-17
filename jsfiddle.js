@@ -13,14 +13,6 @@
 
   const OWNER = "Cadealishus";
   const REPO = "microslop-flight-simulator-web-edition";
-  const REF = "main";
-
-  // Tried in this order, file by file.
-  const BASES = [
-    `https://raw.githubusercontent.com/${OWNER}/${REPO}/${REF}/`,
-    `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}@${REF}/`,
-    `https://${OWNER.toLowerCase()}.github.io/${REPO}/`,
-  ];
 
   document.body.innerHTML = `
     <style>
@@ -57,9 +49,25 @@
 
   // What runs in the new window: fetch the game's page from the first mirror
   // that answers, tell it where its files are, and turn into it.
-  function windowMain(BASES) {
+  function windowMain(OWNER, REPO) {
     const say = t => (document.getElementById("say").textContent = t);
     (async () => {
+      // The latest version, exactly (files pinned to it are never a stale
+      // copy a mirror kept from before an update); "main" if GitHub will not say.
+      let ref = "main";
+      try {
+        const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/commits/main`, { headers: { Accept: "application/vnd.github.sha" }, signal: AbortSignal.timeout(5000) });
+        const sha = r.ok && (await r.text()).trim();
+        if (/^[0-9a-f]{40}$/.test(sha)) ref = sha;
+      } catch (e) {
+        console.warn("[Microslop] no version from GitHub, using main", e);
+      }
+      // Tried in this order, file by file.
+      const BASES = [
+        `https://raw.githubusercontent.com/${OWNER}/${REPO}/${ref}/`,
+        `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}@${ref}/`,
+        `https://${OWNER.toLowerCase()}.github.io/${REPO}/`,
+      ];
       let last;
       for (const base of BASES) {
         try {
@@ -87,7 +95,7 @@
   #say { position: fixed; right: 28px; bottom: 24px; color: #fff; font: 600 15px "Segoe UI", system-ui, sans-serif; text-shadow: 0 2px 8px #000a; }
 </style></head>
 <body><div id="say">Loading…</div>
-<script>(${windowMain.toString()})(${JSON.stringify(BASES)});<\/script>
+<script>(${windowMain.toString()})(${JSON.stringify(OWNER)}, ${JSON.stringify(REPO)});<\/script>
 </body></html>`;
 
   button.onclick = () => {
