@@ -1,8 +1,8 @@
-﻿# Microslop Flight Simulator: Browser Edition
+# Microslop Flight Simulator: Web Edition
 
 The open-world flight simulator, running in your browser with WebAssembly and WebGPU.
 
-**Play:** open this repository's GitHub Pages link (Settings → Pages shows it). It needs Chrome or Edge (recent Safari and Firefox work too).
+**Play:** https://cadealishus.github.io/microslop-flight-simulator-web-edition/ It needs Chrome or Edge (recent Safari and Firefox work too).
 
 The game is a ~73 MB download the first time; after that the browser keeps it.
 
