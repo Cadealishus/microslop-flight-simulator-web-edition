@@ -31,7 +31,8 @@
 <script type="module">
   // Where the game's files come from: next to this page, or (when a launcher
   // such as the JSFiddle one opens this page) the mirrors it lists first.
-  const BASES = [...(window.GAME_BASES || []), new URL("./", location.href).href].filter(b => !b.startsWith("blob:"));
+  // (A page made by a launcher is a blob: with no folder of its own.)
+  const BASES = [...(window.GAME_BASES || []), ...(location.protocol.startsWith("http") ? [new URL("./", location.href).href] : [])];
   const status = document.getElementById("status");
   const pct = document.getElementById("pct");
   const loading = document.getElementById("loading");
