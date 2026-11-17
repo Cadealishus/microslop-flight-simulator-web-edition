@@ -62,11 +62,13 @@
     try {
       // The game is one large file (the aircraft are built in), kept in
       // pieces: counted as they come in.
-      const info = await (await get("pkg/parts.json")).json();
+      // (parts.json fresh every time; the pieces by build number, so they stay
+      // cached between visits but are fetched anew after an update)
+      const info = await (await get("pkg/parts.json?t=" + Date.now())).json();
       const bytes = new Uint8Array(info.size);
       let at = 0;
       for (const name of info.parts) {
-        const reader = (await get("pkg/" + name)).body.getReader();
+        const reader = (await get(`pkg/${name}?v=${info.v}`)).body.getReader();
         for (;;) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -78,7 +80,7 @@
       if (at !== info.size) throw new Error(`the game file came in at ${at} bytes, not ${info.size}`);
       pct.textContent = "100%";
       // The game's own JavaScript, run from wherever it came from.
-      const js = await (await get("pkg/fablegame.js")).text();
+      const js = await (await get(`pkg/fablegame.js?v=${info.v}`)).text();
       const mod = await import(URL.createObjectURL(new Blob([js], { type: "text/javascript" })));
       await mod.default({ module_or_path: bytes });
       document.getElementById("game").focus();

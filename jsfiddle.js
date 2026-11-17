@@ -64,7 +64,8 @@
       for (const base of BASES) {
         try {
           say("Reading the game's page from " + new URL(base).host + "…");
-          const r = await fetch(base + "index.html", { cache: "no-store", mode: "cors" });
+          // (a fresh copy, not one a mirror kept from before the last update)
+          const r = await fetch(base + "index.html?t=" + Date.now(), { cache: "no-store", mode: "cors" });
           if (!r.ok) throw new Error(`HTTP ${r.status} from ${new URL(base).host}`);
           let html = await r.text();
           html = html.replace("<head>", `<head><script>window.GAME_BASES = ${JSON.stringify(BASES)};<\/script>`);
