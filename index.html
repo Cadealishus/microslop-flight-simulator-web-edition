@@ -9,9 +9,7 @@
   #game { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; outline: none; }
   #loading {
     position: fixed; inset: 0; z-index: 10;
-    background: #0b2a5c url("loading.jpg") center / cover no-repeat;
-    background-image: url("loading.jpg"), linear-gradient(160deg, #1a6fd1 0%, #0b2a5c 55%, #06101f 100%);
-    display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+    background: center / cover no-repeat, linear-gradient(160deg, #1a6fd1 0%, #0b2a5c 55%, #06101f 100%);
     transition: opacity .8s ease;
   }
   #loading.done { opacity: 0; pointer-events: none; }
@@ -31,45 +29,63 @@
   <div id="status"></div>
 </div>
 <script type="module">
-  import init from "./pkg/fablegame.js";
+  // Where the game's files come from: next to this page, or (when a launcher
+  // such as the JSFiddle one opens this page) the mirrors it lists first.
+  const BASES = [...(window.GAME_BASES || []), new URL("./", location.href).href].filter(b => !b.startsWith("blob:"));
   const status = document.getElementById("status");
   const pct = document.getElementById("pct");
-  // Only cover the page with the artwork once it has loaded (else the gradient and title show).
-  const art = new Image();
-  art.onload = () => document.getElementById("loading").classList.add("has-art");
-  art.src = "loading.jpg";
+  const loading = document.getElementById("loading");
+
+  // A file from the first mirror that has it.
+  async function get(path) {
+    let last;
+    for (const base of BASES) {
+      try {
+        const r = await fetch(new URL(path, base), { mode: "cors" });
+        if (r.ok) return r;
+        last = new Error(`HTTP ${r.status} for ${path}`);
+      } catch (e) { last = e; }
+    }
+    throw last || new Error("could not download " + path);
+  }
+
+  // The artwork, once it is here (until then the gradient and title show).
+  get("loading.jpg").then(r => r.blob()).then(b => {
+    loading.style.backgroundImage = `url("${URL.createObjectURL(b)}"), linear-gradient(160deg, #1a6fd1 0%, #0b2a5c 55%, #06101f 100%)`;
+    loading.classList.add("has-art");
+  }).catch(() => {});
 
   if (!navigator.gpu) {
     status.textContent = "This browser has no WebGPU, which the game needs. Try Chrome or Edge.";
   } else {
     try {
-      // The game is one large download (the aircraft are built in): show how far along it is.
-      const res = await fetch("pkg/fablegame_bg.wasm");
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      // The real size (the server may send it compressed, so its own length can be smaller).
-      const size = await fetch("pkg/size.txt").then(r => r.ok ? r.text() : "").catch(() => "");
-      const total = +size || (res.headers.get("content-encoding") ? 0 : +res.headers.get("content-length")) || 76000000;
-      const reader = res.body.getReader();
-      const parts = [];
-      let got = 0;
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        parts.push(value);
-        got += value.length;
-        pct.textContent = Math.min(99, Math.floor(100 * got / total)) + "%";
-      }
-      const bytes = new Uint8Array(got);
+      // The game is one large file (the aircraft are built in), kept in
+      // pieces: counted as they come in.
+      const info = await (await get("pkg/parts.json")).json();
+      const bytes = new Uint8Array(info.size);
       let at = 0;
-      for (const p of parts) { bytes.set(p, at); at += p.length; }
+      for (const name of info.parts) {
+        const reader = (await get("pkg/" + name)).body.getReader();
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          bytes.set(value, at);
+          at += value.length;
+          pct.textContent = Math.min(99, Math.floor(100 * at / info.size)) + "%";
+        }
+      }
+      if (at !== info.size) throw new Error(`the game file came in at ${at} bytes, not ${info.size}`);
       pct.textContent = "100%";
-      await init({ module_or_path: bytes });
+      // The game's own JavaScript, run from wherever it came from.
+      const js = await (await get("pkg/fablegame.js")).text();
+      const mod = await import(URL.createObjectURL(new Blob([js], { type: "text/javascript" })));
+      await mod.default({ module_or_path: bytes });
       document.getElementById("game").focus();
     } catch (e) {
       // The game reports its own failures into the status line; this catches the rest.
       if (!String(e).includes("Using exceptions for control flow")) {
         console.error(e);
-        status.textContent = "Could not load the game: " + e;
+        status.textContent = "Could not load the game: " + (e.message || e);
       }
     }
   }
