@@ -21,12 +21,23 @@ Paste this into JSFiddle's **JavaScript** box, press **Run**, then click **▶ O
 
 That line fetches the launcher (`jsfiddle.js`) from this repo, so it always opens the latest version. You can also paste the whole of `jsfiddle.js` into JSFiddle instead.
 
+## Multiplayer
+Fly with friends, including friends on the Windows or Mac version: Esc, then **Multiplayer**, then **Host a room** and share the 5-letter code. Friends type it in and click **Join**, and start right beside you. Or send them a link that joins straight away:
+
+`https://cadealishus.github.io/microslop-flight-simulator-web-edition/?join=K7Q2M&name=Sam`
+
+Other players show as the aircraft they're flying, with green name tags and a box around them when close. Their crashes explode and burn for everyone. Rooms go through free public relays: anyone with the code can join. How it works is in the main repo's README.
+
+## Graphics settings
+Esc, then **Settings**: **Quality** (Low, Medium, High) and **Render distance** (Short, Medium, Far). The Web Edition starts at Medium quality and Short distance, since school and older computers often struggle. Lower settings run smoother.
+
 ## Starting a flight from the address
 Add options to the link, the same as the desktop's command-line options:
 * `?no-menu&airport=KSFO&runway=28R` starts on runway 28R at San Francisco
 * `?no-menu&lat=48.86&lon=2.35&agl=300` starts 300 m over Paris
 * `&aircraft=747` picks the aircraft (`c172`, `ka350`, `747`, `fedup`, `fa18`, `f14`, `a10`, `f117`, `l39`, `c17`)
 * `&time=18.5` sets the local time
+* `&join=K7Q2M` joins a multiplayer room, `&name=Sam` sets your name
 
 ## Controls
 W / S pitch, A / D roll, Q / E rudder, Shift / Ctrl throttle, F / V flaps, L gear, B brakes, C cockpit or chase camera, drag the mouse to look around, Tab flight panel, Esc pause menu, F1 help. Xbox-style gamepads work too. The full list is in the main repo's README.
