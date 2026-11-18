@@ -29,7 +29,7 @@ Fly with friends, including friends on the Windows or Mac version: Esc, then **M
 Other players show as the aircraft they're flying, with green name tags and a box around them when close. Their crashes explode and burn for everyone. Rooms go through free public relays: anyone with the code can join. How it works is in the main repo's README.
 
 ## Graphics settings
-Esc, then **Settings**: **Quality** (Potato, Low, Medium, High), **Render distance** (Short, Medium, Far), and switches for Shadows, Ambient occlusion, Clouds, Trees and Road traffic. On a slow computer (built-in graphics, a Celeron) pick **Potato**: lowest resolution, short distance, and no shadows, clouds, trees or traffic.
+Esc, then **Settings**: **Quality** (Potato, Low, Medium, High), **Render distance** (Short, Medium, Far), and switches for Shadows, Ambient occlusion, Clouds, Trees and Road traffic. On a slow computer (built-in graphics, a Celeron) pick **Potato**: lowest resolution (stretched up smoothly), short distance, and no shadows, trees or traffic.
 
 ## Starting a flight from the address
 Add options to the link, the same as the desktop's command-line options:
