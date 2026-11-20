@@ -2,7 +2,7 @@
   "use strict";
 
   /*
-   * MICROSLOP FLIGHT SIMULATOR: JSFIDDLE LAUNCHER
+   * OPENFLIGHT: JSFIDDLE LAUNCHER
    *
    * Paste this into JSFiddle's JavaScript box and press Run.
    *
@@ -36,7 +36,7 @@
     </style>
     <div id="outer">
       <div>
-        <div class="logo">Microslop<br>Flight Simulator</div>
+        <div class="logo">Openflight</div>
         <div class="sub">WEB EDITION</div>
         <button id="open">▶ OPEN GAME WINDOW</button>
         <div id="msg">Needs Chrome or Edge. The game is a 73 MB download.</div>
@@ -60,7 +60,7 @@
         const sha = r.ok && (await r.text()).trim();
         if (/^[0-9a-f]{40}$/.test(sha)) ref = sha;
       } catch (e) {
-        console.warn("[Microslop] no version from GitHub, using main", e);
+        console.warn("[Openflight] no version from GitHub, using main", e);
       }
       // Tried in this order, file by file.
       const BASES = [
@@ -81,7 +81,7 @@
           return;
         } catch (e) {
           last = e;
-          console.warn("[Microslop] mirror failed", base, e);
+          console.warn("[Openflight] mirror failed", base, e);
         }
       }
       say("Could not reach the game: " + (last && last.message || last));
@@ -89,7 +89,7 @@
   }
 
   const page = `<!doctype html>
-<html><head><meta charset="utf-8"><title>Microslop Flight Simulator</title>
+<html><head><meta charset="utf-8"><title>Openflight</title>
 <style>
   html, body { margin: 0; height: 100%; background: linear-gradient(160deg, #1a6fd1 0%, #0b2a5c 55%, #06101f 100%); }
   #say { position: fixed; right: 28px; bottom: 24px; color: #fff; font: 600 15px "Segoe UI", system-ui, sans-serif; text-shadow: 0 2px 8px #000a; }

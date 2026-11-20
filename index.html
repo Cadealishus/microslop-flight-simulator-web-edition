@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Microslop Flight Simulator</title>
+<title>Openflight</title>
 <style>
   html, body { margin: 0; height: 100%; background: #06101f; overflow: hidden; font-family: "Segoe UI", system-ui, sans-serif; }
   #game { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; outline: none; }
@@ -13,8 +13,10 @@
     transition: opacity .8s ease;
   }
   #loading.done { opacity: 0; pointer-events: none; }
-  #title { position: absolute; top: 38%; left: 0; right: 0; text-align: center; color: #fff; font: italic 900 64px/1 "Segoe UI", system-ui, sans-serif; text-shadow: 0 4px 24px #0008; }
-  #loading.has-art #title { display: none; }
+  /* the name over the art (kept on the picture itself: no name is painted into it) */
+  #title { position: absolute; left: 6%; bottom: 14%; color: #fff; text-shadow: 0 4px 30px #000a, 0 1px 3px #0008; }
+  #title b { display: block; font: italic 900 clamp(48px, 9vw, 120px)/0.95 "Segoe UI", system-ui, sans-serif; letter-spacing: -0.02em; }
+  #title span { display: block; font: 600 clamp(12px, 1.4vw, 18px) "Segoe UI", system-ui, sans-serif; letter-spacing: 0.32em; color: #bfe0ff; margin: 0 0 6px 4px; }
   #pct { position: absolute; right: 28px; bottom: 20px; color: #fff; font: italic 800 40px/1 "Segoe UI", system-ui, sans-serif; text-shadow: 0 2px 12px #000a, 0 0 2px #000; font-variant-numeric: tabular-nums; }
   /* only shown when something went wrong (the game writes its own failures here too) */
   #status { position: absolute; left: 50%; bottom: 32px; transform: translateX(-50%); max-width: min(560px, calc(100% - 32px)); padding: 12px 16px; border-radius: 10px; background: #06101fdd; color: #e8f0ff; font-size: 15px; }
@@ -24,7 +26,7 @@
 <body>
 <canvas id="game" tabindex="0"></canvas>
 <div id="loading">
-  <div id="title">Microslop Flight Simulator</div>
+  <div id="title"><span>FLIGHT SIMULATOR</span><b>Openflight</b></div>
   <div id="pct">0%</div>
   <div id="status"></div>
 </div>
