@@ -1,4 +1,4 @@
-# Microslop Flight Simulator: Web Edition
+# Openflight: Web Edition
 
 The open-world flight simulator, running in your browser. No install.
 
@@ -36,21 +36,24 @@ Add options to the link, the same as the desktop's command-line options:
 * `?no-menu&airport=KSFO&runway=28R` starts on runway 28R at San Francisco
 * `?no-menu&lat=48.86&lon=2.35&agl=300` starts 300 m over Paris
 * `&aircraft=747` picks the aircraft (`c172`, `ka350`, `747`, `fedup`, `fa18`, `f14`, `a10`, `f117`, `l39`, `c17`)
+* `&drive=raptor` starts at the wheel of a car (`raptor`, `countach`), `&drive=foot` on foot (from the next build of the game)
 * `&time=18.5` sets the local time
 * `&join=K7Q2M` joins a multiplayer room, `&name=Sam` sets your name
 
 ## Controls
-W / S pitch, A / D roll, Q / E rudder, Shift / Ctrl throttle, F / V flaps, L gear, B brakes, C cockpit or chase camera, drag the mouse to look around, Tab flight panel, Esc pause menu, F1 help. Xbox-style gamepads work too. The full list is in the main repo's README.
+W / S pitch, A / D roll, Q / E rudder, Shift / Ctrl throttle, F / V flaps, L gear, B brakes, C cockpit or chase camera, drag the mouse to look around, Tab flight panel, Esc pause menu, F1 help. Xbox-style gamepads work too.
+
+**On foot and driving** (from the next build of the game): stop on the ground and press Enter to climb out. On foot: W / S walk, A / D turn, Shift run, 1 / 2 call a Ford F-150 Raptor R / Lamborghini Countach, Enter at a door to get in. Driving: W gas, S brake and reverse, A / D steer, Space handbrake, C inside or chase view, Enter to get out. The full list is in the main repo's README.
 
 ## How it works
 
-**The game** is the same Rust code as the desktop version, compiled to WebAssembly (a fast program format browsers run) and drawing with WebGPU. The menus, flight model, aircraft, buildings and shaders are all the same.
+**The game** is the same Rust code as the desktop version, compiled to WebAssembly (a fast program format browsers run) and drawing with WebGPU. The menus, flight model, aircraft, cars, buildings and shaders are all the same.
 
 **Loading** (`index.html`):
 1. The page shows the loading picture and a percentage.
 2. It reads `pkg/parts.json`, which lists the game file's pieces and their total size.
-3. It downloads the pieces (`pkg/part0.bin`...) and joins them back into the 73 MB game file, counting the percentage as they come in. The file is kept in pieces because the jsDelivr mirror won't serve any file over 20 MB.
-4. It runs `pkg/fablegame.js`, which starts the game from that file.
+3. It downloads the pieces (`pkg/part0.bin`...) and joins them back into the game file, counting the percentage as they come in. The file is kept in pieces because the jsDelivr mirror won't serve any file over 20 MB.
+4. It runs `pkg/openflight.js` (`pkg/fablegame.js` in builds from before the rename), which starts the game from that file.
 
 Every file is tried from a list of mirrors in turn: this site, or when the JSFiddle launcher opened the page, GitHub's raw file server, then jsDelivr, then this site. `parts.json` is fetched fresh each time, and the pieces are cached by a build number, so the browser keeps them between visits and gets new ones after an update.
 
@@ -74,7 +77,9 @@ Every file is tried from a list of mirrors in turn: this site, or when the JSFid
 | `loading.jpg` | the loading picture |
 | `pkg/parts.json` | the game file's size, pieces and build number |
 | `pkg/part*.bin` | the game itself (WebAssembly), in pieces |
-| `pkg/fablegame.js` | the code that connects the game to the browser |
+| `pkg/openflight.js` | the code that connects the game to the browser (`pkg/fablegame.js` before the rename) |
 | `.nojekyll` | tells GitHub Pages to serve the files as they are |
 
 These are build output: they're made from the main repo with `publish-web.ps1`, which rebuilds the game and pushes here.
+
+The cars and the pilot are downloaded models; their authors and licences are in the main repo's `assets/vehicles/CREDITS.md`.
