@@ -82,7 +82,7 @@
       if (at !== info.size) throw new Error(`the game file came in at ${at} bytes, not ${info.size}`);
       pct.textContent = "100%";
       // The game's own JavaScript, run from wherever it came from.
-      const js = await (await get(`pkg/fablegame.js?v=${info.v}`)).text();
+      const js = await (await get(`pkg/openflight.js?v=${info.v}`)).text();
       const mod = await import(URL.createObjectURL(new Blob([js], { type: "text/javascript" })));
       await mod.default({ module_or_path: bytes });
       document.getElementById("game").focus();
